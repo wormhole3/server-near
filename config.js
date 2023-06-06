@@ -28,10 +28,10 @@ const REDIS_PWD = b64uDec(process.env.REDIS_PWD)
 const REDIS_TEST_PWD = b64uDec(process.env.REDIS_TEST_PWD)
 
 // redis keys
-const REDIS_TWEET_KEY = `${KEY_SERVER_NAME}_redis_tweet_key`;
+const REDIS_TWEET_KEY = `redis_tweet_key`;
 // We push new tweet to both produce and debug evironment
 // And we set a toggle to control wheather need to right to the test redis, "test_toggle.js"
-const REDIS_TWEET_KEY_TEST = `${KEY_SERVER_NAME}_redis_tweet_key_test`;
+const REDIS_TWEET_KEY_TEST = `redis_tweet_key_test`;
 
 // Redis expire time(second).
 const REDIS_EXPIRE_TIME = 1000 * 60;
