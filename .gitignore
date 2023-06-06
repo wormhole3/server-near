@@ -1,0 +1,12 @@
+node_modules/
+package-lock.json
+yarn.lock
+.env
+.DS_Store
+logs
+.vscode
+logs/
+debug_toggle.js
+script/
+.proxy
+.env-test
