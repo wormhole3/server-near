@@ -1,8 +1,7 @@
 require("dotenv").config();
 const { b64uDec } = require('./src/utils/helper')
 
-const KEY_SERVER_NAME = "near";
-const TEST_SERVER = true;
+const KEY_SERVER_NAME = process.env.KEY_SERVER_NAME;
 
 const TWITTER_MONITOR_KEYS = [
     b64uDec(process.env.TWITTER_MONITOR1),
@@ -29,9 +28,6 @@ const REDIS_TEST_PWD = b64uDec(process.env.REDIS_TEST_PWD)
 
 // redis keys
 const REDIS_TWEET_KEY = `redis_tweet_key`;
-// We push new tweet to both produce and debug evironment
-// And we set a toggle to control wheather need to right to the test redis, "test_toggle.js"
-const REDIS_TWEET_KEY_TEST = `redis_tweet_key_test`;
 
 // Redis expire time(second).
 const REDIS_EXPIRE_TIME = 1000 * 60;
@@ -45,7 +41,6 @@ const MIN_REP = 1;
 
 module.exports = {
     KEY_SERVER_NAME,
-    TEST_SERVER,
     TWITTER_MONITOR_KEYS,
     TWITTER_MONITOR_RULE,
     TWITTER_POST_TAG,
@@ -54,7 +49,6 @@ module.exports = {
     REDIS_EXPIRE_TIME,
     REDIS_TEST_PWD,
     REDIS_TWEET_KEY,
-    REDIS_TWEET_KEY_TEST,
     FOLLOWER_THRESHOLD,
     MAX_REP,
     MIN_REP,

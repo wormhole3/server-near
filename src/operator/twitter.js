@@ -1,7 +1,7 @@
 
 const { TWITTER_POST_TAG, Curation_Url, Test_Curation_Url,
-    Curation_Short_Url, TWITTER_POPUP_TAG,  TWITTER_LISTEN_FIELDS,
-    MAX_VP, VP_CONSUME, RC_CONSUME, TEST_SERVER, REDIS_TWEET_KEY, REDIS_TWEET_KEY_TEST } = require("../../config");
+    Curation_Short_Url, TWITTER_POPUP_TAG, TWITTER_LISTEN_FIELDS,
+    MAX_VP, VP_CONSUME, RC_CONSUME, REDIS_TWEET_KEY } = require("../../config");
 const { sleep, format, u8arryToHex, sleep2 } = require("../utils/helper")
 const { postMessage } = require("../utils/grpc/report");
 const { ethers } = require("ethers");
@@ -37,7 +37,6 @@ const regex_tweet_link = new RegExp("https://twitter.com/([a-zA-Z0-9\_]+)/status
 const white_blank = /[ | ]+/g
 const regex_hive_tag = /#hive-[0-9]{4,7}/
 const long_content_tag = /^LC([\d]+|E)$/;
-const redis_tweet_key = TEST_SERVER ? REDIS_TWEET_KEY_TEST : REDIS_TWEET_KEY;
 const HK_TAG = 'hk2023';
 const DEFAULT_HIVE_TAG = 'hive-1983477';  // peanut
 const ANN_TAG = "ANN";    // Announcement tag
@@ -906,7 +905,7 @@ process.on('SIGINT', async function () {
 async function processing() {
     logger.debug('Twitter server start...')
     while (isRun) {
-        tStr = await lPop(redis_tweet_key);
+        tStr = await lPop(REDIS_TWEET_KEY);
         if (tStr) {
             tweet = JSON.parse(tStr);
             try {

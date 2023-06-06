@@ -1,6 +1,5 @@
 
-const { TWITTER_MONITOR_RULE, TWITTER_POST_TAG, TWITTER_MONITOR_KEYS, TWITTER_LISTEN_FIELDS, REDIS_TWEET_KEY,
-    REDIS_TWEET_KEY_TEST } = require("../../config");
+const { TWITTER_MONITOR_RULE, TWITTER_POST_TAG, TWITTER_MONITOR_KEYS, TWITTER_LISTEN_FIELDS, REDIS_TWEET_KEY } = require("../../config");
 const { sleep2 } = require("../utils/helper")
 const { postMessage } = require("../utils/grpc/report");
 const { rPush, set, get } = require('../db/redis');
@@ -42,6 +41,8 @@ log4js.configure({
 const logger = log4js.getLogger();
 
 let isRun = true
+// We push new tweet to both produce and debug evironment
+// And we set a toggle to control wheather need to right to the test redis, "test_toggle.js"
 const TEST_TOGGLE_FILE = 'test_toggle.js';
 const REDIS_LAST_READED_TWITTER_ID = `last_tweet_id`;
 let lastKey = '';
@@ -309,7 +310,7 @@ async function writeTweetToDebugEnv(tweetStr) {
     try {
         const res = fs.readFileSync(TEST_TOGGLE_FILE, 'utf8');
         if (parseInt(res) === 1) {
-            redisTest.rPush(REDIS_TWEET_KEY_TEST, tweetStr);
+            redisTest.rPush(REDIS_TWEET_KEY, tweetStr);
         }
     } catch (e) {
         logger.debug('Write tweet to debug env wrong', e)
