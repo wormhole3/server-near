@@ -1,5 +1,5 @@
 
-const { TWITTER_MONITOR_RULE, TWITTER_POST_TAG, TWITTER_MONITOR_KEYS, TWITTER_LISTEN_FIELDS, KEY_SERVER_NAME, REDIS_TWEET_KEY,
+const { TWITTER_MONITOR_RULE, TWITTER_POST_TAG, TWITTER_MONITOR_KEYS, TWITTER_LISTEN_FIELDS, REDIS_TWEET_KEY,
     REDIS_TWEET_KEY_TEST } = require("../../config");
 const { sleep2 } = require("../utils/helper")
 const { postMessage } = require("../utils/grpc/report");
@@ -43,7 +43,7 @@ const logger = log4js.getLogger();
 
 let isRun = true
 const TEST_TOGGLE_FILE = 'test_toggle.js';
-const REDIS_LAST_READED_TWITTER_ID = `${KEY_SERVER_NAME}_last_tweet_id`;
+const REDIS_LAST_READED_TWITTER_ID = `last_tweet_id`;
 let lastKey = '';
 var hasSearched = false;
 

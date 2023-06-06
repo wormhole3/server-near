@@ -1,7 +1,7 @@
 const logger = require('../utils/logger');
 const redis = require('redis');
 require("dotenv").config();
-const { REDIS_EXPIRE_TIME, REDIS_PWD } = require("../../config");
+const { KEY_SERVER_NAME, REDIS_EXPIRE_TIME, REDIS_PWD } = require("../../config");
 
 const REDIS_HOST = process.env.REDIS_HOST || "localhost";
 const REDIS_PORT = process.env.REDIS_PORT || "6379";
@@ -23,7 +23,7 @@ client.on("connect", function () {
 async function getKey() {
   let key;
   try {
-    key = await client.incr(REDIS_KEY);
+    key = await client.incr(`${KEY_SERVER_NAME}_${REDIS_KEY}`);
   } catch (error) {
     console.error("Get the primary key failed", error);
     throw error;
@@ -33,7 +33,7 @@ async function getKey() {
 
 async function incrKey(key) {
   try {
-    return await client.incr(key)
+    return await client.incr(`${KEY_SERVER_NAME}_${key}`)
   } catch (e) {
     console.error("Get the primary key failed", error);
     throw error;
@@ -42,7 +42,7 @@ async function incrKey(key) {
 
 async function decrKey(key) {
   try {
-    return await client.decr(key)
+    return await client.decr(`${KEY_SERVER_NAME}_${key}`)
   } catch (e) {
     console.error("Get the primary key failed", error);
     throw error;
@@ -50,16 +50,17 @@ async function decrKey(key) {
 }
 
 async function get(key) {
-  return await client.get(key)
+  return await client.get(`${KEY_SERVER_NAME}_${key}`)
 }
 
 /**
  * set user register pwd, will clear after a while
- * @param {*} key 
+ * @param {*} _key 
  * @param {*} value 
  * @returns 
  */
-async function set(key, value, needExpire = true) {
+async function set(_key, value, needExpire = true) {
+  let key = `${KEY_SERVER_NAME}_${_key}`;
   try {
     await client.set(key, value);
     if (needExpire) {
@@ -76,7 +77,8 @@ async function set(key, value, needExpire = true) {
   return;
 }
 
-async function del(key) {
+async function del(_key) {
+  let key = `${KEY_SERVER_NAME}_${_key}`;
   try {
     await client.del(key);
   } catch (error) {
@@ -86,7 +88,8 @@ async function del(key) {
   return;
 }
 
-function rPush(key, value) {
+function rPush(_key, value) {
+  let key = `${KEY_SERVER_NAME}_${_key}`;
   try {
     client.rPush(key, value);
   } catch (error) {
@@ -95,7 +98,8 @@ function rPush(key, value) {
   }
 }
 
-async function lPop(key) {
+async function lPop(_key) {
+  let key = `${KEY_SERVER_NAME}_${_key}`;
   try {
     return await client.lPop(key);
   } catch (error) {
