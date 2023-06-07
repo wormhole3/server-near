@@ -1,19 +1,9 @@
 require("dotenv").config();
 const { b64uDec } = require('./src/utils/helper')
 
-const KEY_SERVER_NAME = process.env.KEY_SERVER_NAME;
+const KEY_SERVER_NAME = "near";
 
-const TWITTER_MONITOR_KEYS = [
-    b64uDec(process.env.TWITTER_MONITOR1),
-    b64uDec(process.env.TWITTER_MONITOR2),
-    b64uDec(process.env.TWITTER_MONITOR3),
-    b64uDec(process.env.TWITTER_MONITOR4)
-];
-
-const TWITTER_APP_ACCESS_TOKEN = b64uDec(process.env.TWITTER_APP_ACCESS_TOKEN)
 const TWITTER_SEARCH_TOKEN = b64uDec(process.env.TWITTER_SEARCH_TOKEN)
-const TWITTER_MONITOR_RULE = '@' + process.env.TWITTER_MONITOR_RULE
-const TWITTER_POST_TAG = '#' + process.env.TWITTER_POST_TAG
 
 const TWITTER_LISTEN_FIELDS = {
     "tweet.fields": "id,author_id,text,created_at,conversation_id,entities,geo",
@@ -21,6 +11,7 @@ const TWITTER_LISTEN_FIELDS = {
     "user.fields": "id,name,username,profile_image_url,verified,public_metrics,created_at",
     "media.fields": "media_key,url,preview_image_url,width,height,duration_ms"
 };
+const TWITTER_POST_TAG = '#' + process.env.TWITTER_POST_TAG
 
 // *****************redis********************
 const REDIS_PWD = b64uDec(process.env.REDIS_PWD)
@@ -39,10 +30,10 @@ const FOLLOWER_THRESHOLD = 100000;
 const MAX_REP = 1000000;
 const MIN_REP = 1;
 
+const BOT_MSG_INTERVAL = 30 * 60;
+
 module.exports = {
     KEY_SERVER_NAME,
-    TWITTER_MONITOR_KEYS,
-    TWITTER_MONITOR_RULE,
     TWITTER_POST_TAG,
     TWITTER_LISTEN_FIELDS,
     REDIS_PWD,
@@ -52,6 +43,6 @@ module.exports = {
     FOLLOWER_THRESHOLD,
     MAX_REP,
     MIN_REP,
-    TWITTER_APP_ACCESS_TOKEN,
-    TWITTER_SEARCH_TOKEN
+    TWITTER_SEARCH_TOKEN,
+    BOT_MSG_INTERVAL
 }
