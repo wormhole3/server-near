@@ -9,8 +9,7 @@ CREATE TABLE `user_info` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_del` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `twitter_id` (`twitter_id`),
-  UNIQUE KEY `near_id` (`near_id`),
+  UNIQUE KEY `user` (`twitter_id`,`near_id`),
   KEY `username` (`twitter_username`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
