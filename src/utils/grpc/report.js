@@ -1,7 +1,7 @@
 var grpc = require("@grpc/grpc-js");
 var services = require("./nutbox_bot_grpc_pb");
 var message = require("./nutbox_bot_pb");
-const config = require("../../../operator.config.js")
+const config = require("../../../config.js")
 
 var bot_client = new services.NutboxBotClient(config.BOT_SERVER, grpc.credentials.createInsecure());
 
