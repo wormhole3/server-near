@@ -222,17 +222,9 @@ async function processTweet(tweet) {
         };
         content = replaceImageUrl(tweet, post.content);
         content = content.replace(TWITTER_POST_TAG, '').replace(white_blank, ' ');
-
         post.content = content
 
         await tweetDB.saveTweet(post);
-
-        if (!result) {
-            logger.error("save tweet error: %s", JSON.stringify(post));
-        } else {
-            logger.debug("save tweet: %s", JSON.stringify(post));
-        }
-
     } else {
         logger.debug('Wrong tweet tag', tweet)
     }
@@ -250,7 +242,7 @@ async function processing() {
     while (isRun) {
         tStr = await lPop(REDIS_TWEET_KEY);
         if (tStr) {
-            tweet = JSON.parse(tStr);
+            let tweet = JSON.parse(tStr);
             try {
                 await processTweet(tweet);
             } catch (e) {
