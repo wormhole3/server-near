@@ -57,7 +57,7 @@ async function socialSet(data) {
     const contract = await getCocialContract();
     // let params = { args: { data }, amount: "1000000000000000000000000" };
     let params = { args: { data } };
-    console.log("data:", params);
+    console.log("socialSet data:", data);
     const response = await contract.set(params);
     // console.log("response:", response == "");
     if (response === "") return 1;
