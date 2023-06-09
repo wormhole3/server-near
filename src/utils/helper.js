@@ -150,6 +150,11 @@ function randomUint(seed, min, max) {
   return number.mod(x.minus(n).plus(1)).plus(n);
 }
 
+function getByteLength(str) {
+  const encoder = new TextEncoder();
+  return encoder.encode(str).length;
+}
+
 module.exports = {
   b64uEnc,
   b64uDec,
@@ -164,5 +169,6 @@ module.exports = {
   sleep2,
   hasChinese,
   randomUint,
-  sleepms
+  sleepms,
+  getByteLength
 }

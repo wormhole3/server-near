@@ -3,7 +3,15 @@ const { b64uDec } = require('./src/utils/helper')
 
 const KEY_SERVER_NAME = "near";
 
-const TWITTER_SEARCH_TOKEN = b64uDec(process.env.TWITTER_SEARCH_TOKEN)
+const TWITTER_SEARCH_TOKEN = b64uDec(process.env.TWITTER_SEARCH_TOKEN);
+
+// near 
+const NEAR_NET = "testnet";
+const NEAR_SERVICE_ACCOUNT = "near-necklace.testnet";
+const NEAR_SERVICE_KEY = b64uDec(process.env.NEAR_SERVICE_KEY);
+const NEAR_NODE_RPC = "https://rpc.testnet.near.org";
+const NEAR_SOCIAL_CONTRACT = "v1.social08.testnet"; // social.near
+const NEAR_BINDING_CONTRACT = "binding.wormhole3-dev.testnet";
 
 const TWITTER_LISTEN_FIELDS = {
     "tweet.fields": "id,author_id,text,created_at,conversation_id,entities,geo",
@@ -32,12 +40,18 @@ const MIN_REP = 1;
 // db
 const DB_PASSWORD = b64uDec(process.env.DB_PASSWORD)
 
-const BOT_SERVER= "104.152.208.28:10086";
-const BOT_CHANNEL= "service-monitoring";
+const BOT_SERVER = "104.152.208.28:10086";
+const BOT_CHANNEL = "service-monitoring";
 const BOT_MSG_INTERVAL = 30 * 60;
 
 module.exports = {
     KEY_SERVER_NAME,
+    NEAR_NET,
+    NEAR_SERVICE_ACCOUNT,
+    NEAR_SERVICE_KEY,
+    NEAR_NODE_RPC,
+    NEAR_SOCIAL_CONTRACT,
+    NEAR_BINDING_CONTRACT,
     TWITTER_POST_TAG,
     TWITTER_LISTEN_FIELDS,
     REDIS_PWD,

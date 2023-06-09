@@ -35,11 +35,30 @@ async function saveTweet(tweet) {
                 twitter_id,
                 parent_id,
                 content,
+                images,
                 post_time,
                 retweet_id
             )
-            VALUES (?,?,?,?,?,?);`;
-    await execute(sql, [tweet.tweet_id, tweet.twitter_id, tweet.parent_id, tweet.content, tweet.post_time, tweet.retweet_id]);
+            VALUES (?,?,?,?,?,?,?);`;
+    await execute(sql, [tweet.tweet_id, tweet.twitter_id, tweet.parent_id, tweet.content,
+    JSON.stringify(tweet.images), tweet.post_time, tweet.retweet_id]);
+}
+
+async function getUnPostTweets(limit = 100) {
+    let sql = `SELECT A.*,B.near_id FROM tweets AS A
+                LEFT JOIN user_info AS B ON B.twitter_id=A.twitter_id
+                WHERE A.is_del=0 AND A.status=0 AND (A.parent_id IS NULL OR A.parent_id=A.tweet_id) AND B.is_del=0
+                ORDER BY A.create_time
+                LIMIT ?`;
+    const res = await execute(sql, [limit]);
+    if (res && res.length > 0)
+        return res;
+    return [];
+}
+
+async function updateStatus(tweetId, status) {
+    let sql = "UPDATE tweets SET status=? WHERE tweet_id=?;";
+    await execute(sql, [status, tweetId]);
 }
 
 module.exports = {
@@ -47,5 +66,7 @@ module.exports = {
     getUserByTwitterId,
     updateTwitterUsername,
     existTweet,
-    saveTweet
+    saveTweet,
+    getUnPostTweets,
+    updateStatus
 }

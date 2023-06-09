@@ -20,6 +20,7 @@ CREATE TABLE `tweets` (
 `twitter_id` varchar(64) NOT NULL COMMENT '作者ID(Twitter 账号ID)',
 `parent_id` varchar(32) DEFAULT NULL COMMENT '如果是评论,此值为被评论的id',
 `content` text COLLATE utf8mb4_unicode_ci COMMENT 'Twitter 帖子完整内容',
+`images` text COLLATE utf8mb4_unicode_ci COMMENT '帖子中的图片,json字符串数组',
 `post_time` timestamp NOT NULL,
 `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '同步到Near状态: 0:未同步, 1:已同步, 2:同步失败, 3:重试失败',
 `retweet_id` varchar(64) DEFAULT NULL COMMENT '转推的id',

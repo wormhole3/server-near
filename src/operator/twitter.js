@@ -2,10 +2,11 @@
 const { TWITTER_POST_TAG, REDIS_TWEET_KEY, BOT_MSG_INTERVAL } = require("../../config");
 const { sleep, format, u8arryToHex, sleep2 } = require("../utils/helper")
 const { postMessage } = require("../utils/grpc/report");
-const { ethers } = require("ethers");
+const near = require("../utils/near");
 const { getPageOg } = require('../utils/ogGetter')
 const { lPop, get, set } = require('../db/redis');
 const tweetDB = require('../db/api/tweet')
+const userDB = require("../db/api/user");
 const log4js = require("log4js");
 const { getTweetByTweetId } = require('../utils/twitter/twitter')
 const regex_tweet_link = new RegExp("https://twitter.com/([a-zA-Z0-9\_]+)/status/([0-9]+)[/]?$")
@@ -172,9 +173,20 @@ function replaceImageUrl(tweet, content) {
     return c;
 }
 
+function getImages(tweet) {
+    let images = [];
+    if ("includes" in tweet && "media" in tweet.includes) {
+        for (let index in tweet.includes.media) {
+            let media = tweet.includes.media[index];
+            images.push(media.url ?? media.preview_image_url);
+        }
+    }
+    return images;
+}
+
 // @nutbox !create worm hole account with pub key:publickey
 async function processTweet(tweet) {
-    logger.debug("processing: ", JSON.stringify(tweet));
+    // logger.debug("processing: ", JSON.stringify(tweet));
     if (tweet.errors && tweet.errors.length > 0) {
         await postMessage("[Twitter stream] 🔴 🔴 🔴\nError occured: disconnect to twitter.");
         throw new Error('Catch error twitter message');
@@ -210,17 +222,19 @@ async function processTweet(tweet) {
 
         let [pageInfo, content] = await fetchPageInfo(tweet, text)
         // get retweet id
-        const retweetId = getRetweetId(tweet)
-        const place = getLocation(tweet)
+        const retweetId = getRetweetId(tweet);
+        const place = getLocation(tweet);
+        const images = getImages(tweet);
         let post = {
             tweet_id: tweet.data.id,
             twitter_id: tweet.data.author_id,
             content,
+            images,
             post_time: format(tweet.data.created_at),
             retweet_id: retweetId,
             parent_id: tweet.data.conversation_id
         };
-        content = replaceImageUrl(tweet, post.content);
+        // content = replaceImageUrl(tweet, post.content);
         content = content.replace(TWITTER_POST_TAG, '').replace(white_blank, ' ');
         post.content = content
 
@@ -270,12 +284,66 @@ async function monitor() {
             await postMessage(msg);
             await sleep2(BOT_MSG_INTERVAL, () => !isRun);
         } catch (e) {
-            logger.error("curation error: ", e);
+            logger.error("monitor error: ", e);
         }
     }
 }
 
-Promise.all([processing(), monitor()]).then(async res => {
+async function sendPost() {
+    while (isRun) {
+        try {
+            let tweets = await tweetDB.getUnPostTweets();
+            for (let tweet of tweets) {
+                let status = await near.post(tweet);
+                await tweetDB.updateStatus(tweet.tweet_id, status);
+            }
+            await sleep(3);
+        } catch (e) {
+            logger.error("sendPost error: ", e);
+        }
+    }
+}
+
+async function acceptBinding() {
+    while (isRun) {
+        try {
+            let users = await userDB.getUnbindingUsers();
+            for (let user of users) {
+                let proposal = await near.getProposal(user.near_id)
+                if (!proposal)
+                    continue;
+                if (proposal instanceof String)
+                    if (proposal == "" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`))
+                        continue;
+                if (user.twitter_id != proposal.handle)
+                    continue;
+                let res = await near.acceptBinding(user.near_id, proposal.created_at);
+                if (res) {
+                    await userDB.updateStatus(user.twitter_id, 1);
+                }
+            }
+            await sleep(3);
+        } catch (e) {
+            logger.error("acceptBinding error: ", e);
+        }
+    }
+}
+
+async function postOnChain() {
+    await near.nearInit();
+    Promise.all([
+        sendPost(),
+        acceptBinding()
+    ]).catch(reason => {
+        logger.debug("postOnChain:", reason);
+    });
+}
+
+Promise.all([
+    processing(),
+    monitor(),
+    postOnChain()
+]).then(async res => {
     logger.debug("twitter server stopped.");
     await postMessage(`Wormhole twitter handler stopped: 🔴 🔴 🔴`);
 }).catch().finally(() => {
