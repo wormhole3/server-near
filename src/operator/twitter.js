@@ -305,6 +305,8 @@ async function sendPost() {
 }
 
 async function acceptBinding() {
+    const maxQuest = 180;
+    let cacheUsers = {};
     while (isRun) {
         try {
             let users = await userDB.getUnbindingUsers();
@@ -314,6 +316,15 @@ async function acceptBinding() {
                     continue;
                 if (typeof proposal == "string" || proposal instanceof String)
                     if (proposal == "" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`)) {
+                        if (user.twitter_id in cacheUsers) {
+                            cacheUsers[user.twitter_id] += 1;
+                            if (cacheUsers[user.twitter_id] > maxQuest){
+                                delete cacheUsers[user.twitter_id];
+                                await userDB.updateStatus(user.twitter_id, 2);
+                            }
+                        } else {
+                            cacheUsers[user.twitter_id] = 1;
+                        }
                         await sleep(1);
                         continue;
                     }
