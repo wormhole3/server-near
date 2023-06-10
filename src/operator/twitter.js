@@ -313,8 +313,10 @@ async function acceptBinding() {
                 if (!proposal)
                     continue;
                 if (typeof proposal == "string" || proposal instanceof String)
-                    if (proposal == "" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`))
+                    if (proposal == "" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`)) {
+                        await sleep(1);
                         continue;
+                    }
                 if (user.twitter_id != proposal.handle)
                     continue;
                 let res = await near.acceptBinding(user.near_id, proposal.created_at);
