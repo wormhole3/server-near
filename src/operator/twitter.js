@@ -233,12 +233,12 @@ async function processTweet(tweet) {
 var isRun = true;
 
 process.on('SIGINT', async function () {
-    logger.debug("twitter server stop...");
+    logger.info("twitter server stop...");
     isRun = false;
 });
 
 async function processing() {
-    logger.debug('Twitter server start...')
+    logger.info('Twitter server start...')
     while (isRun) {
         tStr = await lPop(REDIS_TWEET_KEY);
         if (tStr) {
@@ -334,7 +334,7 @@ async function postOnChain() {
         sendPost(),
         acceptBinding()
     ]).catch(reason => {
-        logger.debug("postOnChain:", reason);
+        logger.error("postOnChain:", reason);
     });
 }
 
@@ -343,8 +343,8 @@ Promise.all([
     monitor(),
     postOnChain()
 ]).then(async res => {
-    logger.debug("twitter server stopped.");
-    await postMessage(`Wormhole twitter handler stopped: 🔴 🔴 🔴`);
+    logger.info("twitter server stopped.");
+    await postMessage(`Near twitter handler stopped: 🔴 🔴 🔴`);
 }).catch().finally(() => {
     process.exit();
 })
