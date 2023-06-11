@@ -92,10 +92,8 @@ async function getProposal(nearId, platform = Platform.Twitter) {
     const contract = await getBindingContract();
     try {
         const response = await contract.get_proposal({ account_id: nearId, platform: platform });
-        console.log("getProposal response:", response);
         return response;
     } catch (e) {
-        console.log("getProposal error:", e);
         return e.message;
     }
 }
