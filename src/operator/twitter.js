@@ -300,13 +300,15 @@ async function acceptBinding() {
                 let proposal = await near.getProposal(user.near_id)
                 if (!proposal)
                     continue;
+                logger.debug("acceptBinding proposal:", proposal);
                 if (typeof proposal == "string" || proposal instanceof String)
                     if (proposal == "" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`)) {
                         if (user.twitter_id in cacheUsers) {
                             cacheUsers[user.twitter_id] += 1;
                             if (cacheUsers[user.twitter_id] > maxQuest) {
                                 delete cacheUsers[user.twitter_id];
-                                await userDB.updateStatus(user.twitter_id, 2);
+                                logger.debug("acceptBinding out of date:", user.twitter_id);
+                                await userDB.updateStatus(user.twitter_id, 3);
                             }
                         } else {
                             cacheUsers[user.twitter_id] = 1;
@@ -314,11 +316,17 @@ async function acceptBinding() {
                         await sleep(1);
                         continue;
                     }
-                if (user.twitter_id != proposal.handle)
+                if (user.twitter_id != proposal.handle) {
+                    logger.debug("acceptBinding mismatch:", user.twitter_id, proposal.handle);
+                    await userDB.updateStatus(user.twitter_id, 4);
                     continue;
+                }
                 let res = await near.acceptBinding(user.near_id, proposal.created_at);
-                if (res) {
-                    await userDB.updateStatus(user.twitter_id, 1);
+                if (res === 0) {
+                    await userDB.updateStatus(user.twitter_id, 2);
+                    logger.debug("acceptBinding authed:", user.twitter_id, user.near_id);
+                } else {
+                    logger.error("near.acceptBinding error:", user.twitter_id, user.near_id, res);
                 }
             }
             await sleep(3);

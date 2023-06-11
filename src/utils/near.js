@@ -84,9 +84,8 @@ async function acceptBinding(nearId, createdAt, platform = Platform.Twitter) {
     const contract = await getBindingContract();
     let params = { args: { account_id: nearId, platform: platform, proposal_created_at: createdAt } };
     const response = await contract.accept_binding(params);
-    console.log("acceptBinding response:", response);
-    if (response === "") return true;
-    return false;
+    if (response === "") return 0;
+    return response;
 }
 
 async function getProposal(nearId, platform = Platform.Twitter) {
