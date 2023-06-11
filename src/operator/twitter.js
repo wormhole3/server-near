@@ -300,7 +300,7 @@ async function acceptBinding() {
                 let proposal = await near.getProposal(user.near_id)
                 if (!proposal)
                     continue;
-                logger.debug("acceptBinding proposal:", proposal);
+                logger.debug("acceptBinding proposal:", user.near_id, proposal);
                 if (typeof proposal == "string" || proposal instanceof String)
                     if (proposal == "" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`)) {
                         if (user.twitter_id in cacheUsers) {
