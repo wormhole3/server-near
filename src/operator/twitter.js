@@ -7,26 +7,12 @@ const { getPageOg } = require('../utils/ogGetter')
 const { lPop, get, set } = require('../db/redis');
 const tweetDB = require('../db/api/tweet')
 const userDB = require("../db/api/user");
-const log4js = require("log4js");
 const { getTweetByTweetId } = require('../utils/twitter/twitter')
 const regex_tweet_link = new RegExp("https://twitter.com/([a-zA-Z0-9\_]+)/status/([0-9]+)[/]?$")
 const white_blank = /[ | ]+/g
 const regex_hive_tag = /#hive-[0-9]{4,7}/
 
-log4js.configure({
-    appenders: {
-        handleTweet: {
-            type: "dateFile", filename: "logs/handleTweet.log", pattern: "yy-MM-dd"
-        },
-        consoleout: {
-            type: "console",
-            layout: { type: "colored" }
-        }
-    },
-    categories: { default: { appenders: ["handleTweet", "consoleout"], level: "debug" } }
-});
-
-const logger = log4js.getLogger("handleTweet");
+const logger = require("../utils/logger");
 
 function getAuthor(tweet) {
     if ("includes" in tweet && "users" in tweet.includes) {
@@ -318,7 +304,7 @@ async function acceptBinding() {
                     if (proposal == "" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`)) {
                         if (user.twitter_id in cacheUsers) {
                             cacheUsers[user.twitter_id] += 1;
-                            if (cacheUsers[user.twitter_id] > maxQuest){
+                            if (cacheUsers[user.twitter_id] > maxQuest) {
                                 delete cacheUsers[user.twitter_id];
                                 await userDB.updateStatus(user.twitter_id, 2);
                             }
