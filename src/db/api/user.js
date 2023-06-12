@@ -11,8 +11,8 @@ async function getUnbindingUsers(limit = 100) {
 async function updateStatus(user, status) {
     let sql = "UPDATE twitter_auth_record SET status=? WHERE twitter_id=?;";
     if (status == 2) {
-        sql += `INSERT INTO user_info (twitter_id,near_id,twitter_username) 
-                VALUES ('${user.twitter_id}','${user.near_id}','${user.twitter_username}');`
+        sql += `INSERT INTO user_info (twitter_id,near_id,twitter_username,twitter_name,profile_img) 
+                VALUES ('${user.twitter_id}','${user.near_id}','${user.twitter_username}','${user.twitter_name}','${user.profile_img}');`
     }
     await execute(sql, [status, user.twitter_id]);
 }
