@@ -40,7 +40,7 @@ async function getCocialContract() {
         config.NEAR_SOCIAL_CONTRACT,
         {
             changeMethods: ["set"],
-            viewMethods: ["get_account_storage"]
+            viewMethods: ["get_account_storage", "is_write_permission_granted"]
         }
     );
     return contract;
@@ -98,6 +98,46 @@ async function getProposal(nearId, platform = Platform.Twitter) {
     }
 }
 
+async function isWritePermissionGranted(key) {
+    const contract = await getCocialContract();
+    let params = { args: { predecessor_id: config.NEAR_SERVICE_ACCOUNT, key } };
+    try {
+        const response = await contract.is_write_permission_granted(params);
+        if (response === "true") return true;
+        return false;
+    } catch (e) {
+        return false;
+    }
+}
+
+async function isWritePermissionPost(nearId) {
+    Promise.all([
+        isWritePermissionGranted(`${nearId}/post`),
+        isWritePermissionGranted(`${nearId}/index/post`),
+    ]).then(res => {
+        if ((res[0] === true || res[0] === "true") && (res[1] === true || res[1] === "true")) return true;
+        return false;
+    }).catch(e => {
+        console.log("isWritePermissionPost error:", e);
+        return false;
+    });
+    return false;
+}
+
+async function isWritePermissionComment(nearId) {
+    Promise.all([
+        isWritePermissionGranted(`${nearId}/post`),
+        isWritePermissionGranted(`${nearId}/index/comment`),
+    ]).then(res => {
+        if ((res[0] === true || res[0] === "true") && (res[1] === true || res[1] === "true")) return true;
+        return false;
+    }).catch(e => {
+        console.log("isWritePermissionComment error:", e);
+        return false;
+    });
+    return false;
+}
+
 async function post(tweet) {
     // `{
     //   "x-bit.near": {
@@ -141,5 +181,7 @@ module.exports = {
     acceptBinding,
     Platform,
     getProposal,
-    getAccountStorage
+    getAccountStorage,
+    isWritePermissionComment,
+    isWritePermissionPost
 };
