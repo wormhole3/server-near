@@ -233,12 +233,12 @@ async function processTweet(tweet) {
 var isRun = true;
 
 process.on('SIGINT', async function () {
-    logger.info("twitter server stop...");
+    logger.info("Near server stop...");
     isRun = false;
 });
 
 async function processing() {
-    logger.info('Twitter server start...')
+    logger.info('Near server start...')
     while (isRun) {
         tStr = await lPop(REDIS_TWEET_KEY);
         if (tStr) {
@@ -262,7 +262,7 @@ async function processing() {
 async function monitor() {
     while (isRun) {
         try {
-            msg = `Wormhole twitter handler Status:
+            msg = `Near twitter handler Status:
             -----------------------------------
             twitter server:   🟢
             -----------------------------------
@@ -304,11 +304,11 @@ async function acceptBinding() {
             let users = await userDB.getUnbindingUsers();
             for (let user of users) {
                 let proposal = await near.getProposal(user.near_id)
-                if (!proposal)
-                    continue;
+                // if (!proposal)
+                // continue;
                 logger.debug("acceptBinding proposal:", user.near_id, proposal);
                 if (typeof proposal == "string" || proposal instanceof String)
-                    if (proposal == "" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`)) {
+                    if (proposal == "" || proposal == "None" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`)) {
                         if (user.twitter_id in cacheUsers) {
                             cacheUsers[user.twitter_id] += 1;
                             if (cacheUsers[user.twitter_id] > maxQuest) {
@@ -344,7 +344,7 @@ async function acceptBinding() {
 
 async function postOnChain() {
     await near.nearInit();
-    Promise.all([
+    await Promise.all([
         sendPost(),
         acceptBinding()
     ]).catch(reason => {
@@ -357,8 +357,10 @@ Promise.all([
     monitor(),
     postOnChain()
 ]).then(async res => {
-    logger.info("twitter server stopped.");
+    logger.info("Near server stopped.");
     await postMessage(`Near twitter handler stopped: 🔴 🔴 🔴`);
-}).catch().finally(() => {
+}).catch(e => {
+    logger.error("Near server error:", e);
+}).finally(() => {
     process.exit();
 })
