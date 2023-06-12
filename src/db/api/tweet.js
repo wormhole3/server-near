@@ -1,7 +1,7 @@
 const { execute } = require("../pool");
 
 async function checkUser(twitterId) {
-    let sql = "SELECT id FROM user_info WHERE is_del = 0 AND status = 1 AND twitter_id = ?;";
+    let sql = "SELECT id FROM user_info WHERE is_del = 0 AND twitter_id = ?;";
     const res = await execute(sql, [twitterId]);
     if (res && res.length > 0)
         return true;
@@ -9,7 +9,7 @@ async function checkUser(twitterId) {
 }
 
 async function getUserByTwitterId(twitterId) {
-    let sql = "SELECT * FROM user_info WHERE is_del = 0 AND status = 1 AND twitter_id = ?;";
+    let sql = "SELECT * FROM user_info WHERE is_del = 0 AND twitter_id = ?;";
     const res = await execute(sql, [twitterId]);
     if (res && res.length > 0)
         return res[0];
