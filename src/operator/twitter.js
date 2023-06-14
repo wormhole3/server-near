@@ -197,7 +197,7 @@ async function processTweet(tweet) {
     }
 
     // comment or post
-    if (tweet.data.text.indexOf(TWITTER_POST_TAG) !== -1) {
+    if (tweet.data.text.indexOf(TWITTER_POST_TAG) !== -1 || tweet.data.text.indexOf(TWITTER_POST_TAG.toUpperCase()) !== -1) {
         if (await tweetDB.existTweet(tweet.data.id)) return;
 
         tweet = delSelfUrl(tweet)
