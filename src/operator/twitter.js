@@ -303,11 +303,13 @@ async function acceptBinding() {
         try {
             let users = await userDB.getUnbindingUsers();
             for (let user of users) {
-                let proposal = await near.getProposal(user.near_id)
-                // if (!proposal)
-                // continue;
-                logger.debug("acceptBinding proposal:", user.near_id, proposal);
-                if (typeof proposal == "string" || proposal instanceof String)
+                let proposal = await near.getProposal(user.near_id);
+                let handle = null;
+                if (!proposal) {
+                    handle = await near.getHandle(user.near_id);
+                }
+                logger.debug("acceptBinding proposal:", user.near_id, handle ?? proposal);
+                if (!handle && (typeof proposal == "string" || proposal instanceof String))
                     if (proposal == "" || proposal == "None" || proposal.includes(`Account has no proposals for ${near.Platform.Twitter}`)) {
                         if (user.twitter_id in cacheUsers) {
                             cacheUsers[user.twitter_id] += 1;
@@ -322,17 +324,21 @@ async function acceptBinding() {
                         await sleep(1);
                         continue;
                     }
-                if (user.twitter_id != proposal.handle) {
+                if (user.twitter_id != proposal.handle && user.twitter_id != handle) {
                     logger.debug("acceptBinding mismatch:", user.twitter_id, proposal.handle);
                     await userDB.updateStatus(user, 4);
                     continue;
                 }
-                let res = await near.acceptBinding(user.near_id, proposal.created_at);
-                if (res === 0) {
-                    await userDB.updateStatus(user, 2);
-                    logger.debug("acceptBinding authed:", user.twitter_id, user.near_id);
+                if (!handle) {
+                    let res = await near.acceptBinding(user.near_id, proposal.created_at);
+                    if (res === 0) {
+                        await userDB.updateStatus(user, 2);
+                        logger.debug("acceptBinding authed:", user.twitter_id, user.near_id);
+                    } else {
+                        logger.error("near.acceptBinding error:", user.twitter_id, user.near_id, res);
+                    }
                 } else {
-                    logger.error("near.acceptBinding error:", user.twitter_id, user.near_id, res);
+                    await userDB.updateStatus(user, 2);
                 }
             }
             await sleep(3);

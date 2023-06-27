@@ -74,7 +74,7 @@ async function getBindingContract() {
         config.NEAR_BINDING_CONTRACT,
         {
             changeMethods: ["accept_binding"],
-            viewMethods: ["get_proposal"],
+            viewMethods: ["get_proposal","get_handle"],
         }
     );
     return contract;
@@ -93,6 +93,17 @@ async function getProposal(nearId, platform = Platform.Twitter) {
     try {
         const response = await contract.get_proposal({ account_id: nearId, platform: platform });
         if (!response) return "";
+        return response;
+    } catch (e) {
+        return e.message;
+    }
+}
+
+async function getHandle(nearId,platform=Platform.Twitter){
+    const contract = await getBindingContract();
+    try {
+        const response = await contract.get_handle({ account_id: nearId, platform: platform });
+        if (!response) return null;
         return response;
     } catch (e) {
         return e.message;
@@ -184,5 +195,6 @@ module.exports = {
     getProposal,
     getAccountStorage,
     isWritePermissionComment,
-    isWritePermissionPost
+    isWritePermissionPost,
+    getHandle
 };
