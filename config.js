@@ -17,7 +17,7 @@ const NEAR_VERIFIER_KEY = b64uDec(process.env.NEAR_VERIFIER_KEY);
 
 const NEAR_NODE_RPC = "https://rpc.testnet.near.org";
 const NEAR_SOCIAL_CONTRACT = "v1.social08.testnet"; // social.near
-const NEAR_BINDING_CONTRACT = "binding.wormhole3-dev.testnet";
+const NEAR_BINDING_CONTRACT = "binding.wormhole3.testnet";
 
 const TWITTER_LISTEN_FIELDS = {
     "tweet.fields": "id,author_id,text,created_at,conversation_id,entities,geo",
