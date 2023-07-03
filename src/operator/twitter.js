@@ -1,5 +1,5 @@
 
-const { TWITTER_POST_TAG, REDIS_TWEET_KEY, BOT_MSG_INTERVAL, NEAR_SERVICE_ACCOUNT } = require("../../config");
+const { TWITTER_POST_TAG, REDIS_TWEET_KEY, BOT_MSG_INTERVAL, NEAR_SENDER_ACCOUNT } = require("../../config");
 const { sleep, format, u8arryToHex, sleep2 } = require("../utils/helper")
 const { postMessage } = require("../utils/grpc/report");
 const near = require("../utils/near");
@@ -284,7 +284,7 @@ async function sendPost() {
                     let status = await near.post(tweet);
                     await tweetDB.updateStatus(tweet.tweet_id, status);
                 } else {
-                    logger.warn(`Account "${NEAR_SERVICE_ACCOUNT}" does not have write permission for "${tweet.near_id}", tweet: ${tweet.tweet_id}`);
+                    logger.warn(`Account "${NEAR_SENDER_ACCOUNT}" does not have write permission for "${tweet.near_id}", tweet: ${tweet.tweet_id}`);
                     await tweetDB.updateStatus(tweet.tweet_id, tweet.status == 2 ? 3 : 2);
                 }
 

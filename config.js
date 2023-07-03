@@ -7,8 +7,14 @@ const TWITTER_SEARCH_TOKEN = b64uDec(process.env.TWITTER_SEARCH_TOKEN);
 
 // near 
 const NEAR_NET = "testnet";
-const NEAR_SERVICE_ACCOUNT = "near-necklace.testnet";
-const NEAR_SERVICE_KEY = b64uDec(process.env.NEAR_SERVICE_KEY);
+
+const NEAR_SENDER_ACCOUNT = process.env.NEAR_SENDER_ACCOUNT ?? "sender.wormhole3.testnet";
+const NEAR_SENDER_KEY = b64uDec(process.env.NEAR_SENDER_KEY);
+
+const NEAR_VERIFIER_ACCOUNT = process.env.NEAR_VERIFIER_ACCOUNT ?? "verifier.wormhole3.testnet";
+const NEAR_VERIFIER_KEY = b64uDec(process.env.NEAR_VERIFIER_KEY);
+
+
 const NEAR_NODE_RPC = "https://rpc.testnet.near.org";
 const NEAR_SOCIAL_CONTRACT = "v1.social08.testnet"; // social.near
 const NEAR_BINDING_CONTRACT = "binding.wormhole3-dev.testnet";
@@ -47,8 +53,10 @@ const BOT_MSG_INTERVAL = 30 * 60;
 module.exports = {
     KEY_SERVER_NAME,
     NEAR_NET,
-    NEAR_SERVICE_ACCOUNT,
-    NEAR_SERVICE_KEY,
+    NEAR_SENDER_ACCOUNT,
+    NEAR_SENDER_KEY,
+    NEAR_VERIFIER_ACCOUNT,
+    NEAR_VERIFIER_KEY,
     NEAR_NODE_RPC,
     NEAR_SOCIAL_CONTRACT,
     NEAR_BINDING_CONTRACT,

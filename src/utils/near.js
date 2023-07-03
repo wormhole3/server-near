@@ -30,11 +30,12 @@ var nearConnection = null;
 
 async function nearInit() {
     nearConnection = await connect(connectionConfig);
-    await myKeyStore.setKey(config.NEAR_NET, config.NEAR_SERVICE_ACCOUNT, KeyPair.fromString(config.NEAR_SERVICE_KEY));
+    await myKeyStore.setKey(config.NEAR_NET, config.NEAR_SENDER_ACCOUNT, KeyPair.fromString(config.NEAR_SENDER_KEY));
+    await myKeyStore.setKey(config.NEAR_NET, config.NEAR_VERIFIER_ACCOUNT, KeyPair.fromString(config.NEAR_VERIFIER_KEY));
 }
 
-async function getCocialContract() {
-    const account = await nearConnection.account(config.NEAR_SERVICE_ACCOUNT);
+async function getCocialContract(_account = config.NEAR_SENDER_ACCOUNT) {
+    const account = await nearConnection.account(_account);
     const contract = new Contract(
         account,
         config.NEAR_SOCIAL_CONTRACT,
@@ -67,14 +68,14 @@ async function socialSet(data) {
     return 2;
 }
 
-async function getBindingContract() {
-    const account = await nearConnection.account(config.NEAR_SERVICE_ACCOUNT);
+async function getBindingContract(_account = config.NEAR_VERIFIER_ACCOUNT) {
+    const account = await nearConnection.account(_account);
     const contract = new Contract(
         account,
         config.NEAR_BINDING_CONTRACT,
         {
             changeMethods: ["accept_binding"],
-            viewMethods: ["get_proposal","get_handle"],
+            viewMethods: ["get_proposal", "get_handle"],
         }
     );
     return contract;
@@ -99,7 +100,7 @@ async function getProposal(nearId, platform = Platform.Twitter) {
     }
 }
 
-async function getHandle(nearId,platform=Platform.Twitter){
+async function getHandle(nearId, platform = Platform.Twitter) {
     const contract = await getBindingContract();
     try {
         const response = await contract.get_handle({ account_id: nearId, platform: platform });
@@ -112,7 +113,7 @@ async function getHandle(nearId,platform=Platform.Twitter){
 
 async function isWritePermissionGranted(key) {
     const contract = await getCocialContract();
-    let params = { predecessor_id: config.NEAR_SERVICE_ACCOUNT, key };
+    let params = { predecessor_id: config.NEAR_SENDER_ACCOUNT, key };
     try {
         const response = await contract.is_write_permission_granted(params);
         if (response === true || response === "true") return true;
