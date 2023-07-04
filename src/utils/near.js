@@ -174,7 +174,7 @@ async function post(tweet) {
                 main.image = { url: imgs[0] };
             } else {
                 for (let img of imgs) {
-                    main.text += `![${img}](${img}) `;
+                    main.text += `  \n![](${img})`;
                 }
             }
 
