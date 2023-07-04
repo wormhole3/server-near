@@ -6,7 +6,7 @@ const KEY_SERVER_NAME = "near";
 const TWITTER_SEARCH_TOKEN = b64uDec(process.env.TWITTER_SEARCH_TOKEN);
 
 // near 
-const NEAR_NET = "testnet";
+const NEAR_NET = process.env.NEAR_NET ?? "testnet";
 
 const NEAR_SENDER_ACCOUNT = process.env.NEAR_SENDER_ACCOUNT ?? "sender.wormhole3.testnet";
 const NEAR_SENDER_KEY = b64uDec(process.env.NEAR_SENDER_KEY);
@@ -15,9 +15,9 @@ const NEAR_VERIFIER_ACCOUNT = process.env.NEAR_VERIFIER_ACCOUNT ?? "verifier.wor
 const NEAR_VERIFIER_KEY = b64uDec(process.env.NEAR_VERIFIER_KEY);
 
 
-const NEAR_NODE_RPC = "https://rpc.testnet.near.org";
-const NEAR_SOCIAL_CONTRACT = "v1.social08.testnet"; // social.near
-const NEAR_BINDING_CONTRACT = "binding.wormhole3.testnet";
+const NEAR_NODE_RPC = process.env.NEAR_NODE_RPC ?? "https://rpc.testnet.near.org";
+const NEAR_SOCIAL_CONTRACT = process.env.NEAR_SOCIAL_CONTRACT ?? "v1.social08.testnet"; // social.near
+const NEAR_BINDING_CONTRACT = process.env.NEAR_BINDING_CONTRACT ?? "binding.wormhole3.testnet";
 
 const TWITTER_LISTEN_FIELDS = {
     "tweet.fields": "id,author_id,text,created_at,conversation_id,entities,geo",

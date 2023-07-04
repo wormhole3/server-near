@@ -22,9 +22,9 @@ const connectionConfig = {
     networkId: config.NEAR_NET,
     keyStore: myKeyStore, // first create a key store 
     nodeUrl: config.NEAR_NODE_RPC,
-    walletUrl: "https://wallet.testnet.near.org",
-    helperUrl: "https://helper.testnet.near.org",
-    explorerUrl: "https://explorer.testnet.near.org",
+    // walletUrl: "https://wallet.testnet.near.org",
+    // helperUrl: "https://helper.testnet.near.org",
+    // explorerUrl: "https://explorer.testnet.near.org",
 };
 var nearConnection = null;
 
