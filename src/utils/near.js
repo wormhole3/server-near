@@ -170,7 +170,14 @@ async function post(tweet) {
     if (tweet.images) {
         let imgs = JSON.parse(tweet.images);
         if (imgs instanceof Array && imgs.length > 0) {
-            main.image = { url: imgs[0] };
+            if (imgs.length == 1) {
+                main.image = { url: imgs[0] };
+            } else {
+                for (let img of imgs) {
+                    main.text += `![${img}](${img}) `;
+                }
+            }
+
         }
     }
     let data = {};
