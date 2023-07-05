@@ -85,7 +85,7 @@ async function socialSet(data) {
         return 2;
     }
     if (result && result.status && result.status.SuccessValue == "") {
-        console.log(1, result);
+        // console.log(1, result);
         let block_hash = result.receipts_outcome instanceof Array ? result.receipts_outcome[0].block_hash : result.receipts_outcome.block_hash;
         const provider = new providers.JsonRpcProvider({ url: connectionConfig.nodeUrl });
         const block = await provider.block({ blockId: block_hash });
