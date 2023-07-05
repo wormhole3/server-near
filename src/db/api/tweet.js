@@ -56,9 +56,37 @@ async function getUnPostTweets(limit = 100) {
     return [];
 }
 
+async function getUnReplyTweets(limit = 100) {
+    let sql = `SELECT A.*,B.near_id FROM tweets AS A
+                LEFT JOIN user_info AS B ON B.twitter_id=A.twitter_id
+                WHERE A.is_del=0 AND A.status IN(0,2) AND (A.parent_id IS NOT NULL OR A.parent_id!=A.tweet_id) AND B.is_del=0
+                ORDER BY A.create_time
+                LIMIT ?`;
+    const res = await execute(sql, [limit]);
+    if (res && res.length > 0)
+        return res;
+    return [];
+}
+
 async function updateStatus(tweetId, status) {
-    let sql = "UPDATE tweets SET status=? WHERE tweet_id=?;";
-    await execute(sql, [status, tweetId]);
+    let sql = "";
+    if (status instanceof Array) {
+        sql = "UPDATE tweets SET status=?,block=? WHERE tweet_id=?;";
+        await execute(sql, [status[0], status[1], tweetId]);
+    } else {
+        sql = "UPDATE tweets SET status=? WHERE tweet_id=?;";
+        await execute(sql, [status, tweetId]);
+    }
+}
+
+async function getTweetByParent(tweetId) {
+    let sql = `SELECT A.*,B.near_id FROM tweets AS A
+                LEFT JOIN user_info AS B ON B.twitter_id=A.twitter_id
+                WHERE A.is_del=0 AND A.status=1 AND B.is_del=0 AND A.tweet_id=?`;
+    const res = await execute(sql, [tweetId]);
+    if (res && res.length > 0)
+        return res[0];
+    return null;
 }
 
 module.exports = {
@@ -68,5 +96,7 @@ module.exports = {
     existTweet,
     saveTweet,
     getUnPostTweets,
-    updateStatus
+    updateStatus,
+    getUnReplyTweets,
+    getTweetByParent
 }

@@ -287,7 +287,31 @@ async function sendPost() {
                     logger.warn(`Account "${NEAR_SENDER_ACCOUNT}" does not have write permission for "${tweet.near_id}", tweet: ${tweet.tweet_id}`);
                     await tweetDB.updateStatus(tweet.tweet_id, tweet.status == 2 ? 3 : 2);
                 }
+            }
+            await sleep(3);
+        } catch (e) {
+            logger.error("sendPost error: ", e);
+        }
+    }
+}
 
+async function sendReply() {
+    while (isRun) {
+        try {
+            let tweets = await tweetDB.getUnReplyTweets();
+            for (let tweet of tweets) {
+                let parent = await tweetDB.getTweetByParent(tweet.parent_id);
+                if (!parent) {
+                    await tweetDB.updateStatus(tweet.tweet_id, tweet.status == 2 ? 3 : 2);
+                    continue;
+                }
+                if (await near.isWritePermissionComment(tweet.near_id)) {
+                    let status = await near.comment(tweet, parent);
+                    await tweetDB.updateStatus(tweet.tweet_id, status);
+                } else {
+                    logger.warn(`Account "${NEAR_SENDER_ACCOUNT}" does not have write permission for "${tweet.near_id}", tweet: ${tweet.tweet_id}`);
+                    await tweetDB.updateStatus(tweet.tweet_id, tweet.status == 2 ? 3 : 2);
+                }
             }
             await sleep(3);
         } catch (e) {
@@ -352,6 +376,7 @@ async function postOnChain() {
     await near.nearInit();
     await Promise.all([
         sendPost(),
+        sendReply(),
         acceptBinding()
     ]).catch(reason => {
         logger.error("postOnChain:", reason);

@@ -2,7 +2,7 @@ const nearAPI = require("near-api-js");
 const config = require("../../config");
 const { getByteLength } = require("../utils/helper");
 
-const { keyStores, KeyPair, connect, Contract } = nearAPI;
+const { keyStores, KeyPair, connect, Contract, providers } = nearAPI;
 const myKeyStore = new keyStores.InMemoryKeyStore();
 
 const Platform = Object.freeze({
@@ -54,7 +54,7 @@ async function getAccountStorage(nearId) {
     return response;
 }
 
-async function socialSet(data) {
+async function socialSet0(data) {
     const contract = await getCocialContract();
     // let params = { args: { data }, amount: "1000000000000000000000000" };
     let params = { args: { data } };
@@ -66,6 +66,33 @@ async function socialSet(data) {
         return 3;
     }
     return 2;
+}
+
+async function socialSet(data) {
+    const account = await nearConnection.account(config.NEAR_SENDER_ACCOUNT);
+    let result = null;
+    try {
+        result = await account.functionCall({
+            contractId: config.NEAR_SOCIAL_CONTRACT,
+            methodName: 'set',
+            args: { data }
+        });
+    } catch (e) {
+        if ("kind" in e) {
+            if (e.kind.ExecutionError.includes("The attached deposit is less than the minimum storage balance"))
+                return 3;
+        }
+        return 2;
+    }
+    if (result && result.status && result.status.SuccessValue == "") {
+        console.log(1, result);
+        let block_hash = result.receipts_outcome instanceof Array ? result.receipts_outcome[0].block_hash : result.receipts_outcome.block_hash;
+        const provider = new providers.JsonRpcProvider({ url: connectionConfig.nodeUrl });
+        const block = await provider.block({ blockId: block_hash });
+        return [1, block.header.height]; // [status,block_height]
+    } else {
+        return 2;
+    }
 }
 
 async function getBindingContract(_account = config.NEAR_VERIFIER_ACCOUNT) {
@@ -151,7 +178,7 @@ async function isWritePermissionComment(nearId) {
     });
 }
 
-async function comment(tweet){
+async function comment(tweet, parent) {
     /**
      {
         "necklace.testnet": {
@@ -164,6 +191,35 @@ async function comment(tweet){
         }
     }
     **/
+    let comment = {
+        type: "md",
+        text: tweet.content,
+        item: { type: "social", path: `${parent.near_id}/post/main`, blockHeight: parent.block }
+    };
+    if (tweet.images) {
+        let imgs = JSON.parse(tweet.images);
+        if (imgs instanceof Array && imgs.length > 0) {
+            if (imgs.length == 1) {
+                comment.image = { url: imgs[0] };
+            } else {
+                for (let img of imgs) {
+                    comment.text += `  \n![](${img})`;
+                }
+            }
+        }
+    }
+    let data = {};
+    data[tweet.near_id] = {
+        post: { comment: JSON.stringify(comment) },
+        index: { comment: `{"key":{"type":"social","path":"${parent.near_id}/post/main","blockHeight":${parent.block}},"value":{"type":"md"}}` }
+    };
+    // check storage
+    let len = getByteLength(JSON.stringify(data));
+    let storage = await getAccountStorage(tweet.near_id);
+    if (!storage || storage == "null" || storage.available_bytes < len)
+        return 3;
+
+    return await socialSet(data);
 }
 
 async function post(tweet) {
@@ -219,5 +275,6 @@ module.exports = {
     getAccountStorage,
     isWritePermissionComment,
     isWritePermissionPost,
-    getHandle
+    getHandle,
+    comment
 };
