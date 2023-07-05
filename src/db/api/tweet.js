@@ -82,7 +82,7 @@ async function updateStatus(tweetId, status) {
 async function getTweetByParent(tweetId) {
     let sql = `SELECT A.*,B.near_id FROM tweets AS A
                 LEFT JOIN user_info AS B ON B.twitter_id=A.twitter_id
-                WHERE A.is_del=0 AND A.status=1 AND B.is_del=0 AND A.tweet_id=?`;
+                WHERE A.is_del=0 AND A.status=1 AND B.is_del=0 AND A.block!='0' AND A.tweet_id=?`;
     const res = await execute(sql, [tweetId]);
     if (res && res.length > 0)
         return res[0];
