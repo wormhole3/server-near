@@ -151,6 +151,21 @@ async function isWritePermissionComment(nearId) {
     });
 }
 
+async function comment(tweet){
+    /**
+     {
+        "necklace.testnet": {
+            "post": {
+                "comment": "{\"type\":\"md\",\"text\":\"Go, go, go! Allez, Allez, Allez!\",\"item\":{\"type\":\"social\",\"path\":\"necklace.testnet/post/main\",\"blockHeight\":130931868}}"
+            },
+            "index": {
+                "comment": "{\"key\":{\"type\":\"social\",\"path\":\"necklace.testnet/post/main\",\"blockHeight\":130931868},\"value\":{\"type\":\"md\"}}"
+            }
+        }
+    }
+    **/
+}
+
 async function post(tweet) {
     // `{
     //   "x-bit.near": {

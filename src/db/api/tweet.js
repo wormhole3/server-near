@@ -47,7 +47,7 @@ async function saveTweet(tweet) {
 async function getUnPostTweets(limit = 100) {
     let sql = `SELECT A.*,B.near_id FROM tweets AS A
                 LEFT JOIN user_info AS B ON B.twitter_id=A.twitter_id
-                WHERE A.is_del=0 AND A.status=0 AND (A.parent_id IS NULL OR A.parent_id=A.tweet_id) AND B.is_del=0
+                WHERE A.is_del=0 AND A.status IN(0,2) AND (A.parent_id IS NULL OR A.parent_id=A.tweet_id) AND B.is_del=0
                 ORDER BY A.create_time
                 LIMIT ?`;
     const res = await execute(sql, [limit]);
