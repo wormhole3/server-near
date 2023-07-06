@@ -193,7 +193,7 @@ async function comment(tweet, parent) {
     **/
     let comment = {
         type: "md",
-        text: tweet.content,
+        text: tweet.content.replace(/^(@\S+\s+)+/, ""),
         item: { type: "social", path: `${parent.near_id}/post/main`, blockHeight: parent.block }
     };
     if (tweet.images) {
