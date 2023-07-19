@@ -239,9 +239,10 @@ async function _saveTweet(tweet) {
     content = content.replace(TWITTER_POST_TAG, '').replace(white_blank, ' ');
     post.content = content
 
-    await tweetDB.saveTweet(post);
     // save tweet if available
     await _saveRetweet(retweetId);
+
+    await tweetDB.saveTweet(post);
 }
 
 var isRun = true;
