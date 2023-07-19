@@ -315,7 +315,7 @@ async function sendReply() {
         try {
             let tweets = await tweetDB.getUnReplyTweets();
             for (let tweet of tweets) {
-                let parent = await tweetDB.getTweetByParent(tweet.parent_id);
+                let parent = await tweetDB.getTweetByTweetId(tweet.parent_id);
                 if (!parent) {
                     await tweetDB.updateStatus(tweet.tweet_id, tweet.status == 2 ? 3 : 2);
                     continue;

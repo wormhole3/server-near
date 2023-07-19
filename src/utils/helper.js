@@ -1,5 +1,6 @@
 const moment = require("moment");
 const BigNumber = require('bignumber.js');
+const lodash = require("lodash");
 
 const b64uLookup = {
   "/": "_",
@@ -155,6 +156,11 @@ function getByteLength(str) {
   return encoder.encode(str).length;
 }
 
+function isEmpty(obj) {
+  if (lodash.isUndefined(obj) || lodash.isNull(obj) || lodash.isEmpty(obj)) return true;
+  return false;
+}
+
 module.exports = {
   b64uEnc,
   b64uDec,
@@ -170,5 +176,6 @@ module.exports = {
   hasChinese,
   randomUint,
   sleepms,
-  getByteLength
+  getByteLength,
+  isEmpty
 }

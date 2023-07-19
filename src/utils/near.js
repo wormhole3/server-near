@@ -1,6 +1,8 @@
 const nearAPI = require("near-api-js");
 const config = require("../../config");
-const { getByteLength } = require("../utils/helper");
+const { getByteLength, isEmpty } = require("../utils/helper");
+const lodash = require("lodash");
+const tweetDB = require("../db/api/tweet");
 
 const { keyStores, KeyPair, connect, Contract, providers } = nearAPI;
 const myKeyStore = new keyStores.InMemoryKeyStore();
@@ -222,6 +224,37 @@ async function comment(tweet, parent) {
     return await socialSet(data);
 }
 
+function mergeImages(tweet) {
+    let txt = "";
+    if (tweet.images) {
+        let imgs = JSON.parse(tweet.images);
+        if (imgs instanceof Array && imgs.length > 0) {
+            for (let img of imgs) {
+                txt += `  \n![](${img})`;
+            }
+        }
+    }
+    return txt;
+}
+
+async function mergeRetweet(tweet) {
+    let txt = "";
+    if (!isEmpty(tweet.retweet_id)) {
+        let retweet = await tweetDB.getTweetByTweetId(tweet.retweet_id);
+        if (retweet) {
+            if (!isEmpty(retweet.near_id)){
+                txt += `  \n>![](${retweet.profile_img})  @${retweet.near_id}`;
+            }
+            txt += `  \n>${retweet.content.replace("\n", "\n>")}`;
+            let imgTxt = mergeImages(retweet);
+            if (imgTxt) {
+                txt += imgTxt.replace("\n", "\n>");
+            }
+        }
+    }
+    return txt;
+}
+
 async function post(tweet) {
     // `{
     //   "x-bit.near": {
@@ -238,19 +271,10 @@ async function post(tweet) {
         type: "md",
         text: tweet.content
     };
-    if (tweet.images) {
-        let imgs = JSON.parse(tweet.images);
-        if (imgs instanceof Array && imgs.length > 0) {
-            if (imgs.length == 1) {
-                main.image = { url: imgs[0] };
-            } else {
-                for (let img of imgs) {
-                    main.text += `  \n![](${img})`;
-                }
-            }
 
-        }
-    }
+    main.text += mergeImages(tweet);
+    main.text += mergeRetweet(tweet);
+
     let data = {};
     data[tweet.near_id] = {
         post: { main: JSON.stringify(main) },
