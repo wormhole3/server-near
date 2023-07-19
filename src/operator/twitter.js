@@ -11,6 +11,7 @@ const { getTweetByTweetId } = require('../utils/twitter/twitter')
 const regex_tweet_link = new RegExp("https://twitter.com/([a-zA-Z0-9\_]+)/status/([0-9]+)[/]?$")
 const white_blank = /[ | ]+/g
 const regex_hive_tag = /#hive-[0-9]{4,7}/
+const lodash = require("lodash");
 
 const logger = require("../utils/logger");
 
@@ -199,35 +200,48 @@ async function processTweet(tweet) {
     // comment or post
     if (tweet.data.text.indexOf(TWITTER_POST_TAG) !== -1 || tweet.data.text.indexOf(TWITTER_POST_TAG.toUpperCase()) !== -1) {
         if (await tweetDB.existTweet(tweet.data.id)) return;
-
-        tweet = delSelfUrl(tweet)
-        tweet = showOriginalUrl(tweet)
-        let text = tweet.data.text.trim();
-        let user = getAuthor(tweet);
-        let tags = getTags(tweet);
-
-        let [pageInfo, content] = await fetchPageInfo(tweet, text)
-        // get retweet id
-        const retweetId = getRetweetId(tweet);
-        const place = getLocation(tweet);
-        const images = getImages(tweet);
-        let post = {
-            tweet_id: tweet.data.id,
-            twitter_id: tweet.data.author_id,
-            content,
-            images,
-            post_time: format(tweet.data.created_at),
-            retweet_id: retweetId,
-            parent_id: tweet.data.conversation_id
-        };
-        // content = replaceImageUrl(tweet, post.content);
-        content = content.replace(TWITTER_POST_TAG, '').replace(white_blank, ' ');
-        post.content = content
-
-        await tweetDB.saveTweet(post);
+        await _saveTweet(tweet);
     } else {
         logger.debug('Wrong tweet tag', tweet)
     }
+}
+
+async function _saveRetweet(retweetId) {
+    if (lodash.isUndefined(retweetId) || lodash.isNull(retweetId) || lodash.isEmpty(retweetId)) return;
+    if (tweetDB.existTweet(retweetId)) return;
+    let tweet = await getTweetByTweetId(retweetId);
+    await _saveTweet(tweet);
+}
+
+async function _saveTweet(tweet) {
+    if (lodash.isUndefined(tweet) || lodash.isNull(tweet) || lodash.isEmpty(tweet)) return;
+    tweet = delSelfUrl(tweet)
+    tweet = showOriginalUrl(tweet)
+    let text = tweet.data.text.trim();
+    let user = getAuthor(tweet);
+    let tags = getTags(tweet);
+
+    let [pageInfo, content] = await fetchPageInfo(tweet, text);
+    // get retweet id
+    const retweetId = getRetweetId(tweet);
+    const place = getLocation(tweet);
+    const images = getImages(tweet);
+    let post = {
+        tweet_id: tweet.data.id,
+        twitter_id: tweet.data.author_id,
+        content,
+        images,
+        post_time: format(tweet.data.created_at),
+        retweet_id: retweetId,
+        parent_id: tweet.data.conversation_id
+    };
+    // content = replaceImageUrl(tweet, post.content);
+    content = content.replace(TWITTER_POST_TAG, '').replace(white_blank, ' ');
+    post.content = content
+
+    await tweetDB.saveTweet(post);
+    // save tweet if available
+    await _saveRetweet(retweetId);
 }
 
 var isRun = true;
