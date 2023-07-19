@@ -210,6 +210,7 @@ async function _saveRetweet(retweetId) {
     if (lodash.isUndefined(retweetId) || lodash.isNull(retweetId) || lodash.isEmpty(retweetId)) return;
     if (tweetDB.existTweet(retweetId)) return;
     let tweet = await getTweetByTweetId(retweetId);
+    console.log("retweetId:", retweetId, tweet);
     await _saveTweet(tweet);
 }
 
