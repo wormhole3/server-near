@@ -242,7 +242,7 @@ async function mergeRetweet(tweet) {
     if (!isEmpty(tweet.retweet_id)) {
         let retweet = await tweetDB.getTweetByTweetId(tweet.retweet_id);
         if (retweet) {
-            if (!isEmpty(retweet.near_id)){
+            if (!isEmpty(retweet.near_id)) {
                 txt += `  \n>![](${retweet.profile_img})  @${retweet.near_id}`;
             }
             txt += `  \n>${retweet.content.replace("\n", "\n>")}`;
@@ -273,7 +273,7 @@ async function post(tweet) {
     };
 
     main.text += mergeImages(tweet);
-    main.text += mergeRetweet(tweet);
+    main.text += await mergeRetweet(tweet);
 
     let data = {};
     data[tweet.near_id] = {
