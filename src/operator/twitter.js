@@ -208,7 +208,7 @@ async function processTweet(tweet) {
 
 async function _saveRetweet(retweetId) {
     if (lodash.isUndefined(retweetId) || lodash.isNull(retweetId) || lodash.isEmpty(retweetId)) return;
-    if (await tweetDB.existTweet(retweetId)) return;
+    if (tweetDB.existTweet(retweetId)) return;
     let tweet = await getTweetByTweetId(retweetId);
     await _saveTweet(tweet);
 }
