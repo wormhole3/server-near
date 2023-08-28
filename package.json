@@ -7,7 +7,8 @@
     "yarn": "~1.22.15"
   },
   "scripts": {
-    "start": "node -r 'global-agent/bootstrap' ./src/operator/twitter.js"
+    "start": "node -r 'global-agent/bootstrap' ./src/operator/twitter.js",
+    "tools": "node -r 'global-agent/bootstrap' ./tools.js"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.6.7",
