@@ -172,6 +172,7 @@ async function isWritePermissionComment(nearId) {
         isWritePermissionGranted(`${nearId}/post`),
         isWritePermissionGranted(`${nearId}/index/comment`),
     ]).then(res => {
+        console.log(`${nearId}授权情况post,comment:`, res)
         if ((res[0] === true || res[0] === "true") && (res[1] === true || res[1] === "true")) return true;
         return false;
     }).catch(e => {
