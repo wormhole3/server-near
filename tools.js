@@ -23,7 +23,9 @@ async function searchPermission() {
         let tweet = await Tweets.getTweetByTweetId(args.tweetId);
         if (tweet) {
             await Near.nearInit();
-            if (await Near.isWritePermissionComment(tweet.near_id)) {
+            let post = await Near.isWritePermissionPost(tweet.near_id);
+            let comment = await Near.isWritePermissionComment(tweet.near_id);
+            if (post && comment) {
                 console.log(`${tweet.near_id} 已授权！`);
             } else {
                 console.log(`${tweet.near_id} 未授权！`);

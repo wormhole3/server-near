@@ -158,7 +158,7 @@ async function isWritePermissionPost(nearId) {
         isWritePermissionGranted(`${nearId}/post`),
         isWritePermissionGranted(`${nearId}/index/post`),
     ]).then(res => {
-        // console.log("res:", res)
+        console.log(`${nearId} 授权情况post,index/post:`, res);
         if ((res[0] === true || res[0] === "true") && (res[1] === true || res[1] === "true")) return true;
         return false;
     }).catch(e => {
@@ -172,7 +172,7 @@ async function isWritePermissionComment(nearId) {
         isWritePermissionGranted(`${nearId}/post`),
         isWritePermissionGranted(`${nearId}/index/comment`),
     ]).then(res => {
-        console.log(`${nearId}授权情况post,comment:`, res)
+        console.log(`${nearId} 授权情况post,index/comment:`, res);
         if ((res[0] === true || res[0] === "true") && (res[1] === true || res[1] === "true")) return true;
         return false;
     }).catch(e => {
